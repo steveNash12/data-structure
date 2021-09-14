@@ -3,6 +3,8 @@ package com.sxl.tree;
 import com.sun.xml.internal.ws.api.client.WSPortInfo;
 import org.omg.CORBA.DATA_CONVERSION;
 
+import java.awt.event.KeyEvent;
+
 /**
  * @author songxl
  * @create 2021-09-13 16:27
@@ -49,11 +51,78 @@ public class Tree23 {
     }
 
     /**
+     * 插入数据到2-3 查找树
+     * @param key
+     * @param value
+     */
+    public void insert(Integer key,String value) {
+
+        Data data = new Data(key,value);
+        Node currentNode = root;
+        while (true) {
+            if (currentNode.isLeaf()) {
+                break;
+            }else {
+//                不是叶子节点
+                // 获取下一个子节点
+                currentNode = getNextChild(currentNode,key);
+                for (int i = 0; i < currentNode.getItemNum(); i++) {
+                    if(currentNode.getData(i).key.equals(key)) {
+                        // 找到了 赋值
+                        currentNode.getData(i).value = value;
+                        return;
+                    }
+                }
+
+            }
+        }
+        // 没有找到(但是找到了插入位置)，执行插入操作
+        if (currentNode.isFull()) {
+            spit(currentNode,data);
+        }else {
+            currentNode.insertData(data);
+        }
+
+    }
+    /**
      * 裂变节点
-     * @param node
-     * @param data
+     * 构造新节点替换
+     * @param node 被裂变的节点
+     * @param data 要保存的数据
      */
     private void spit(Node node, Data data) {
+        Node parent = node.getParent();
+        // 最大节点
+        Node maxNode = new Node();
+        // 中间节点
+        Node midNode = new Node();
+        // 找出 maxNode  midNode 和最小节点 node
+        if(data.key < node.getData(0).key) {
+            maxNode.insertData(node.removeLastItem());
+            midNode.insertData(node.removeLastItem());
+        }else if (data.key < node.getData(1).key) {
+            // 中间
+            maxNode.insertData(node.removeLastItem());
+            midNode.insertData(data);
+        }else {
+            maxNode.insertData(data);
+            midNode.insertData(node.removeLastItem());
+        }
+
+        if (node == root) {
+            root = midNode;
+        }
+        midNode.connectChild(0,node);
+        midNode.connectChild(1,maxNode);
+//        conn
+    }
+
+    /**
+     * 连接节点
+     * @param parent
+     * @param node
+     */
+    private void connectNoe(Node parent,Node node) {
 
     }
 
@@ -221,7 +290,7 @@ public class Tree23 {
          *移除最后一个键值对
          * @return
          */
-        private Data removeItem() {
+        private Data removeLastItem() {
             Data tmp = itemDatas[itemCount-1];
             itemDatas[itemCount-1] = null;
             itemCount--;
@@ -238,6 +307,11 @@ public class Tree23 {
     private static class Data {
         public Integer key;
         public String value;
+
+        public Data(Integer key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 
         public void print() {
             System.out.print("/"+key+"----"+value);
