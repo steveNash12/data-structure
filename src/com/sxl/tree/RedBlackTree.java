@@ -111,7 +111,7 @@ public class RedBlackTree<Key extends Comparable<Key>,Value> {
          */
         public boolean color;
 
-        
+
         public Node(Node left, Node right, Key key, Value value, boolean color) {
             this.left = left;
             this.right = right;
