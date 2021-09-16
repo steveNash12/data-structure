@@ -10,6 +10,10 @@ public class RedBlackTree<Key extends Comparable<Key>,Value> {
     private Node<Key,Value> root;
     private int n;
 
+    public RedBlackTree() {
+        this.n = 0;
+    }
+
     /**
      * 红色
      */
@@ -96,9 +100,44 @@ public class RedBlackTree<Key extends Comparable<Key>,Value> {
         }else {
             return get(x.right,key);
         }
+    }
+
+    public void put(Key key,Value value) {
+
+       root = put(root,key,value);
+       root.color = BLACK;
 
     }
 
+    public Node put(Node<Key,Value> h,Key key,Value value) {
+        if (h == null) {
+            n++;
+            return new Node(null,null,key,value,RED);
+        }
+
+        int diff = key.compareTo(h.key);
+        if (diff <  0) {
+            h.left = put(h.left,key,value);
+        }else if (diff > 0) {
+            h.right = put(h.right,key,value);
+        }else {
+            h.value = value;
+        }
+        // 左链接为黑色，有链接为红色 左旋
+        if (!isRed(h.left) && isRed(h.right)) {
+            h = rotateLeft(h);
+        }
+        // 左链接为红色、左子链接也为红色  右旋
+        if (isRed(h.left) && isRed(h.left.left)) {
+            h = rotateRight(h);
+        }
+        // 左右链接都为红色
+        if (isRed(h.left) && isRed(h.right)) {
+            flipRed(h);
+        }
+        return h;
+
+    }
     private static class Node<Key extends Comparable<Key>,Value> {
         public Node<Key,Value> left;
         public Node<Key,Value> right;
@@ -121,5 +160,16 @@ public class RedBlackTree<Key extends Comparable<Key>,Value> {
         }
     }
 
+    public static void main(String[] args) {
+
+        RedBlackTree<Integer,String> redBlackTree = new RedBlackTree();
+        redBlackTree.put(4,"44");
+        redBlackTree.put(1,"11");
+
+        redBlackTree.put(3,"33");
+
+        redBlackTree.put(5,"55");
+        System.out.println(redBlackTree.n);
+    }
 
 }

@@ -197,7 +197,7 @@ public class Tree23 {
         private void connectChild(int index,Node child) {
             childNodes[index] = child;
             if (child != null) {
-                child.parent == this;
+//                child.parent == this;
             }
         }
 
